@@ -533,7 +533,7 @@ Contributions are welcome! Please:
 
 ```bash
 # Clone and setup
-git clone https://github.com/yourusername/trading-bot.git
+git clone https://github.com/houmannkeihanfar-sys/TradeBot
 cd trading-bot
 python -m venv venv
 venv\Scripts\activate
