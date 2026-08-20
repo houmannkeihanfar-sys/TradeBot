@@ -17,7 +17,7 @@ except ImportError:
     sys.exit(1)
 
 # Proxy config
-PROXY_URL = os.environ.get("HTTPS_PROXY", os.environ.get("ALL_PROXY", "socks5://127.0.0.1:10808"))
+PROXY_URL = os.environ.get("HTTPS_PROXY", os.environ.get("ALL_PROXY", ""))
 
 
 PASS1_PROMPT = """Analyze this entire trading video.

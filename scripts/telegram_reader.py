@@ -33,9 +33,14 @@ async def main():
     
     print("اتصال برقرار شد!")
     
-    # Read channel posts
-    channel_username = "Pashacapitall"
-    target_post = 465
+    # Read channel posts (pass as arguments)
+    if len(sys.argv) < 3:
+        print("Usage: python scripts/telegram_reader.py <channel> <post_id>")
+        print("Example: python scripts/telegram_reader.py ChannelName 465")
+        sys.exit(1)
+    
+    channel_username = sys.argv[1]
+    target_post = int(sys.argv[2])
     
     print(f"\nدر حال خواندن پست {target_post} از کانال {channel_username}...")
     

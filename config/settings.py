@@ -18,7 +18,7 @@ for d in [DATA_DIR, STRATEGIES_DIR, BACKTESTS_DIR, TRADES_DIR]:
 
 # MT5 Config
 MT5_CONFIG = {
-    "server": "AronMarkets-Demo",
+    "server": os.environ.get("MT5_SERVER", "YourBroker-Demo"),
     "login": None,  # Set via env or panel
     "password": None,  # Set via env or panel
     "timeout": 10000,

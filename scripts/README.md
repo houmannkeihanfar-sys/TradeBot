@@ -3,7 +3,7 @@
 
 ## نحوه استفاده
 ```bash
-cd C:\Users\Houmann\trading-bot
+cd <your_project_path>\trading-bot
 venv\Scripts\python.exe scripts/<script_name> <args>
 ```
 
