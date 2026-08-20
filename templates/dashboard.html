@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Bot Panel</title>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; }
+        .card { @apply bg-white rounded-xl shadow-lg p-6; }
+        .profit { @apply text-green-600 font-bold; }
+        .loss { @apply text-red-600 font-bold; }
+        .buy { @apply bg-green-100 text-green-800 px-2 py-1 rounded; }
+        .sell { @apply bg-red-100 text-red-800 px-2 py-1 rounded; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">🤖 Trading Bot Panel</h1>
+            <div class="text-sm">
+                {{ time }} | 
+                {% if connected %}
+                <span class="bg-green-500 px-2 py-1 rounded">متصل</span>
+                {% else %}
+                <span class="bg-red-500 px-2 py-1 rounded">قطع</span>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4">
+        {% if connected and data %}
+        <!-- Account Info -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="card">
+                <div class="text-gray-500 text-sm">مانده حساب</div>
+                <div class="text-2xl font-bold">${{ "%.2f"|format(data.account.balance) }}</div>
+            </div>
+            <div class="card">
+                <div class="text-gray-500 text-sm">اکوئیتی</div>
+                <div class="text-2xl font-bold">${{ "%.2f"|format(data.account.equity) }}</div>
+            </div>
+            <div class="card">
+                <div class="text-gray-500 text-sm">سود/ضرر</div>
+                <div class="text-2xl {% if data.account.profit >= 0 %}profit{% else %}loss{% endif %}">
+                    ${{ "%.2f"|format(data.account.profit) }}
+                </div>
+            </div>
+            <div class="card">
+                <div class="text-gray-500 text-sm">مارجین آزاد</div>
+                <div class="text-2xl font-bold">${{ "%.2f"|format(data.account.margin_free) }}</div>
+            </div>
+        </div>
+
+        <!-- Price & Positions -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Price Card -->
+            <div class="card">
+                <h2 class="text-lg font-bold mb-4">📊 EURUSD</h2>
+                {% if data.price %}
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                        <div class="text-gray-500 text-sm">Bid</div>
+                        <div class="text-xl font-bold">{{ "%.5f"|format(data.price.bid) }}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 text-sm">Ask</div>
+                        <div class="text-xl font-bold">{{ "%.5f"|format(data.price.ask) }}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 text-sm">Spread</div>
+                        <div class="text-xl font-bold">{{ data.price.spread }}</div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center text-gray-500">قیمت در دسترس نیست</div>
+                {% endif %}
+            </div>
+
+            <!-- Positions -->
+            <div class="card">
+                <h2 class="text-lg font-bold mb-4">📋 پوزیشن‌های باز ({{ data.positions|length }})</h2>
+                {% if data.positions %}
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b">
+                                <th class="p-2 text-right">نماد</th>
+                                <th class="p-2 text-right">نوع</th>
+                                <th class="p-2 text-right">حجم</th>
+                                <th class="p-2 text-right">ورود</th>
+                                <th class="p-2 text-right">SL</th>
+                                <th class="p-2 text-right">TP</th>
+                                <th class="p-2 text-right">سود</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pos in data.positions %}
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="p-2 font-bold">{{ pos.symbol }}</td>
+                                <td class="p-2">
+                                    <span class="{% if pos.type == 'BUY' %}buy{% else %}sell{% endif %}">
+                                        {{ pos.type }}
+                                    </span>
+                                </td>
+                                <td class="p-2">{{ pos.volume }}</td>
+                                <td class="p-2">{{ "%.5f"|format(pos.price_open) }}</td>
+                                <td class="p-2">{{ "%.5f"|format(pos.sl) }}</td>
+                                <td class="p-2">{{ "%.5f"|format(pos.tp) }}</td>
+                                <td class="p-2 {% if pos.profit >= 0 %}profit{% else %}loss{% endif %}">
+                                    ${{ "%.2f"|format(pos.profit) }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-gray-500 py-8">پوزیشن بازی وجود ندارد</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card mt-6">
+            <h2 class="text-lg font-bold mb-4">⚡ عملیات سریع</h2>
+            <div class="flex gap-4 flex-wrap">
+                <button hx-post="/api/buy?symbol=EURUSD.&volume=0.01" 
+                        hx-swap="none"
+                        class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-bold">
+                    🟢 BUY EURUSD 0.01
+                </button>
+                <button hx-post="/api/sell?symbol=EURUSD.&volume=0.01"
+                        hx-swap="none"
+                        class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg font-bold">
+                    🔴 SELL EURUSD 0.01
+                </button>
+                <button hx-get="/api/refresh"
+                        hx-target="#positions"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg">
+                    🔄 بروزرسانی
+                </button>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- Not Connected -->
+        <div class="card max-w-md mx-auto mt-20 text-center">
+            <h2 class="text-xl font-bold mb-4">⚠️ متاتریدر متصل نیست</h2>
+            <p class="text-gray-600 mb-4">لطفاً MT5 را باز کنید و اجازه Algo Trading را بدهید</p>
+            <div class="text-sm text-gray-500">
+                Tools → Options → Expert Advisors → Allow algorithmic trading
+            </div>
+        </div>
+        {% endif %}
+    </main>
+
+    <!-- Auto-refresh every 5 seconds -->
+    <script>
+        setInterval(function() {
+            htmx.trigger('body', 'refresh');
+        }, 5000);
+    </script>
+</body>
+</html>

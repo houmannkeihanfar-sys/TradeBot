@@ -1,0 +1,66 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# === Virtual Environment ===
+venv/
+.venv/
+env/
+
+# === Environment Variables ===
+.env
+.env.local
+.env.production
+
+# === Sensitive Data (NEVER commit) ===
+config/account.yaml
+config/credentials.yaml
+*.session
+*.session-journal
+trading_bot_session.session
+secrets/
+
+# === Data Files ===
+data/knowledge.db
+data/transcriptions/
+data/video_analysis/
+data/frames/
+data/telegram/
+data/backtests/
+data/trades/
+media/
+
+# === Videos (large files) ===
+videos/
+*.mp4
+*.wav
+*.mp3
+
+# === Tools ===
+tools/
+
+# === Temp Files ===
+temp_*
+*.tmp
+*.log
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# === OS ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === Gemini Session ===
+.genai/

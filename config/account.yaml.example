@@ -1,0 +1,7 @@
+# کپی این فایل به account.yaml و اطلاعات خود را وارد کنید
+# هرگز account.yaml را commit نکنید
+
+broker: "YourBrokerName"
+server: "YourServer-Demo"
+login: 0  # شماره حساب
+type: "demo"
